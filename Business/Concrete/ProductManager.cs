@@ -1,6 +1,7 @@
 ﻿using Business.Abstract;
 using Business.Constants.Messages;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Entities;
 using Core.Utilities.Results;
@@ -26,13 +27,10 @@ namespace Business.Concrete
             _productDal = productDal;
         }
 
+
+        [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
-          
-
-            ValidationTool.Validate(new ProductValidator(),product);
-         
-
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);  //Resultın içeriğini set etmedik ancak geçici olarak böyle return ediyoruz.Result bir IResult implementasyonu olduğu için onu kullandık.
         }
@@ -53,10 +51,10 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(), "Başarılı");
         }
 
-        public IDataResult< List<Product>> GetAllByCategoryId(int id)
+        public IDataResult<List<Product>> GetAllByCategoryId(int id)
         {
             //   return _productDal.GetAll(p => p.CategoryId == id);   //EfProductDal'daki GetAll() fonksiyonunun filtre işlemi olduğundaki versiyonunu çağırıp sonucunda gelen listeyi return ediyorum.
-            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == id),"Verilen idye göre kategoriler getirildi.");
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == id), "Verilen idye göre kategoriler getirildi.");
         }
 
         public IDataResult<Product> GetById(int productId)
@@ -68,14 +66,14 @@ namespace Business.Concrete
         public IDataResult<List<Product>> GetByUnitPrice(decimal min, decimal max)
         {
             // return _productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max);
-            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max),"İlgili aralığa göre ürünler getirildi");
-           
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max), "İlgili aralığa göre ürünler getirildi");
+
         }
 
         public IDataResult<List<ProductDetailDto>> GetProductDetails()
         {
             //return _productDal.GetProductDetails();
-            return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails(),"ürünler getirildi");
+            return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails(), "ürünler getirildi");
         }
     }
 }
