@@ -1,9 +1,12 @@
 ﻿using Business.Abstract;
 using Business.Constants.Messages;
+using Business.ValidationRules.FluentValidation;
+using Core.CrossCuttingConcerns.Validation;
 using Core.Entities;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,11 +28,11 @@ namespace Business.Concrete
 
         public IResult Add(Product product)
         {
-            if (product.ProductName.Length < 2)
-            {
-                return new ErrorResult(Messages.ProductNameInvalid);
-            }
-            //business code
+          
+
+            ValidationTool.Validate(new ProductValidator(),product);
+         
+
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);  //Resultın içeriğini set etmedik ancak geçici olarak böyle return ediyoruz.Result bir IResult implementasyonu olduğu için onu kullandık.
         }
