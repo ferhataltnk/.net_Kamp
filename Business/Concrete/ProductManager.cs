@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Business.Constants.Messages;
 using Core.Entities;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
@@ -24,9 +25,13 @@ namespace Business.Concrete
 
         public IResult Add(Product product)
         {
+            if (product.ProductName.Length < 2)
+            {
+                return new ErrorResult(Messages.ProductNameInvalid);
+            }
             //business code
             _productDal.Add(product);
-            return new SuccessResult("Ürün Eklendi!");  //Resultın içeriğini set etmedik ancak geçici olarak böyle return ediyoruz.Result bir IResult implementasyonu olduğu için onu kullandık.
+            return new SuccessResult(Messages.ProductAdded);  //Resultın içeriğini set etmedik ancak geçici olarak böyle return ediyoruz.Result bir IResult implementasyonu olduğu için onu kullandık.
         }
 
         public IDataResult<List<Product>> GetAll()
@@ -36,8 +41,13 @@ namespace Business.Concrete
             //Yetkisi var mı ?
 
             //return _productDal.GetAll();
-            return new SuccessDataResult<List<Product>>(_productDal.GetAll(),"Başarılı");
 
+            if (DateTime.Now.Hour == 1)
+            {
+                return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
+            }
+
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(), "Başarılı");
         }
 
         public IDataResult< List<Product>> GetAllByCategoryId(int id)
